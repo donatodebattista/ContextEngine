@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { cosineSimilarity } from "../utils/similarity.util.js";
 
 const filePath = path.resolve("data/documents.json");
 
@@ -31,4 +32,18 @@ export async function readData() {
     } catch {
         return [];
     }
+}
+
+export async function searchSimilar(queryEmbedding, topK = 3) {
+    const data = await readData();
+
+    const scored = data.map(item => ({
+        text: item.text,
+        score: cosineSimilarity(queryEmbedding, item.embedding)
+    }));
+
+    // ordenar de mayor a menor
+    scored.sort((a, b) => b.score - a.score);
+
+    return scored.slice(0, topK);
 }

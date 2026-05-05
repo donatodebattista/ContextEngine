@@ -1,3 +1,5 @@
+import { queryDocuments } from "../services/rag.service.js";
+
 export const handleQuery = async (req, res) => {
     try {
         const { question } = req.body;
@@ -6,10 +8,11 @@ export const handleQuery = async (req, res) => {
             return res.status(400).json({ error: "Question is required" });
         }
 
-        // TODO: integrar RAG
-        return res.json({
-            answer: "Respuesta mock",
-            sources: []
+        const results = await queryDocuments(question);
+
+        res.json({
+            answer: results.answer,
+            sources: results.sources
         });
 
     } catch (error) {
