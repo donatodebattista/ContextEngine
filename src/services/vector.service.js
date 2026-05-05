@@ -3,13 +3,14 @@ import path from "path";
 
 const filePath = path.resolve("data/documents.json");
 
-export async function saveChunks(chunks) {
+export async function saveChunks(chunksWithEmbeddings) {
     try {
         const existing = await readData();
 
-        const newData = chunks.map((text, index) => ({
+        const newData = chunksWithEmbeddings.map((item, index) => ({
             id: Date.now() + index,
-            text
+            text: item.text,
+            embedding: item.embedding
         }));
 
         const updated = [...existing, ...newData];
