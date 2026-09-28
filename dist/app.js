@@ -1,3 +1,5 @@
+import path from 'node:path';
+import fs from 'node:fs';
 import express from 'express';
 import cors from 'cors';
 import { createApiRouter } from './presentation/routes/api.routes.js';
@@ -34,7 +36,15 @@ export function createApp() {
     // 3. API Routes
     const apiRouter = createApiRouter(documentController, queryController, healthController);
     app.use('/api', apiRouter);
-    // 4. Centralized Error Handler
+    // 4. Static Frontend Assets (Production single-service deployment)
+    const frontendDistPath = path.resolve(process.cwd(), 'frontend', 'dist');
+    if (fs.existsSync(frontendDistPath)) {
+        app.use(express.static(frontendDistPath));
+        app.get(/^(?!\/api).*/, (_req, res) => {
+            res.sendFile(path.join(frontendDistPath, 'index.html'));
+        });
+    }
+    // 5. Centralized Error Handler
     app.use(errorHandler);
     return { app, vectorRepository };
 }
